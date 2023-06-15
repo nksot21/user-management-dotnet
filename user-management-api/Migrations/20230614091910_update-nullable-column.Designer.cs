@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using user_management_api.Data;
 
@@ -11,9 +12,11 @@ using user_management_api.Data;
 namespace user_management_api.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230614091910_update-nullable-column")]
+    partial class updatenullablecolumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace user_management_api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("user_management_api.Entities.IndividualUser", b =>
+            modelBuilder.Entity("user_management_api.Models.IndividualUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -36,8 +39,7 @@ namespace user_management_api.Migrations
                         .HasColumnName("createdAt");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("deletedAt");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(255)
@@ -55,10 +57,6 @@ namespace user_management_api.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("password");
-
-                    b.Property<int>("Salt")
-                        .HasColumnType("int")
-                        .HasColumnName("salt");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2")

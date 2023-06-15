@@ -11,7 +11,7 @@ namespace user_management_api.Controllers
     }
 
     [ApiController]
-    [Route("/api/v1/user")]
+    [Route("/api/v1/users")]
     public class UserController : Controller
     {
 

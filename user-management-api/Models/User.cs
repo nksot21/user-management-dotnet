@@ -1,9 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace user_management_api.Models
 {
     public class User
     {
+        [Key]
         public int Id { get; set; }
         public string Fullname { get; set; }
         public string Username { get; set; }
@@ -13,9 +16,8 @@ namespace user_management_api.Models
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set;}
 
-        public Nullable<DateTime>  DeletedAt { get; set; }
+        public DateTime?  DeletedAt { get; set; } = DateTime.Now;
 
-        [JsonConstructor]
         public User()
         {
             CreatedAt = DateTime.Now;
