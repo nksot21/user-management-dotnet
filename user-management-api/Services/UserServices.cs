@@ -3,6 +3,7 @@ using user_management_api.Data;
 using user_management_api.Entities;
 using user_management_api.Helpers;
 using user_management_api.Models;
+using user_management_api.Repositories;
 
 namespace user_management_api.Services
 {
@@ -22,18 +23,20 @@ namespace user_management_api.Services
     public class UserServices : IUserServices
     {
         private IDatabaseService databaseService { get; }
+        private IUserRepository userRepository { get; }
 
-        public UserServices(IDatabaseService databaseService)
+        public UserServices(IDatabaseService databaseService, IUserRepository userRepository)
         {
             this.databaseService = databaseService;
+            this.userRepository = userRepository;
         }
+
         //public async Task<(bool, string)> CreateUser(IndividualUser user)
              public async Task<bool> CreateUser(IndividualUser user)
         {
             try
             {
-                await databaseService.Context.IndividualUsersModel.AddAsync(user);
-                await databaseService.Context.SaveChangesAsync();
+                await userRepository.Add(user);
                 //return (true, "Thnhaf công");
                 return true;
             }catch (Exception ex)
@@ -44,14 +47,14 @@ namespace user_management_api.Services
 
         public async Task<List<IndividualUser>> GetAllUser()
         {
-            List<IndividualUser> allUserLst = await databaseService.Context.IndividualUsersModel.ToListAsync();
+            List<IndividualUser> allUserLst = await userRepository.GetAll();
             List<IndividualUser> userLst = allUserLst.Where(usr => usr.DeletedAt == null).ToList();
             return userLst;
         }
 
         public async Task<IndividualUser> GetUserById(int id)
         {
-            var usr = await databaseService.Context.IndividualUsersModel.FirstOrDefaultAsync(x => (x.Id == id && x.DeletedAt == null));
+            var usr = await userRepository.GetById(id);
             return usr;
         }
 
@@ -63,8 +66,7 @@ namespace user_management_api.Services
                 user.Username = userReq.Username;
                 user.Email = userReq.Email;
                 user.UpdatedAt = DateTime.Now;
-                databaseService.Context.Update(user);
-                await databaseService.Context.SaveChangesAsync();
+                await userRepository.Update(user);
                 return true;
             }catch(Exception ex)
             {
@@ -78,8 +80,7 @@ namespace user_management_api.Services
         {
             try
             {
-                databaseService.Context.IndividualUsersModel.Remove(urs);
-                await databaseService.Context.SaveChangesAsync();
+                await userRepository.Delete(urs);
                 return true;
             }catch(Exception ex)
             {
@@ -93,7 +94,7 @@ namespace user_management_api.Services
             try
             {
                 urs.DeletedAt = DateTime.Now;
-                await databaseService.Context.SaveChangesAsync();
+                await userRepository.Update(urs);
                 return true;
             }
             catch(Exception ex)
