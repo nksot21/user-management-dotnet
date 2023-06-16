@@ -2,14 +2,20 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using user_management_api.Middlewares;
+using user_management_api.Repositories;
 using user_management_api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Services.AddDbContext
+//Services
 builder.Services.AddScoped<IDatabaseService, DatabaseService>();
+builder.Services.AddScoped<IMongoService, MongoService>();
 builder.Services.AddScoped<IUserServices, UserServices>();
-//builder.Services.AddTransient<RequestHandleMiddleware>();
+builder.Services.AddScoped<IRecordRequestService, RecordRequestService>();
+
+//Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 // Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -43,13 +49,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<RequestHandleMiddleware>();
-
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+// Middleware pipeline
+app.UseMiddleware<RequestHandleMiddleware>();
+app.UseMiddleware<RecordRequestMiddleware>();
+
 app.MapControllers();
+
 
 
 app.Run();

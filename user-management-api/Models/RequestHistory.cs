@@ -7,7 +7,7 @@ namespace user_management_api.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public ObjectId Id { get; set; }
         public string Method { get; set; }
         public string Url { get; set; }
         public DateTime RequestDateTime { get; set; } = DateTime.Now;

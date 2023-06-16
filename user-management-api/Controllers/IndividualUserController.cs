@@ -107,10 +107,13 @@ namespace user_management_api.Controllers
         [Authorize]
         async public Task<IActionResult> GetProfile()
         {
+            // Get Token 
             var token = await HttpContext.GetTokenAsync("access_token");
             if (token == null)
                 throw new Exception("Get Bearer Token failed");
+            // Get Payload
             var username = JWTHelper.GetPayload(token);
+            // Get User
             IndividualUser usr = await userService.FindByUsername(username);
             UserResponseModel response = new UserResponseModel(usr.Fullname, usr.Username, usr.Email, usr.CreatedAt, usr.UpdatedAt);
             return Ok(new Response { Status = 200, Message = "Get Profile Successfully", Data = response });
