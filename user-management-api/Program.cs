@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using System.Text;
+using user_management_api.Data;
 using user_management_api.Middlewares;
 using user_management_api.Repositories;
 using user_management_api.Services;
@@ -8,10 +11,9 @@ using user_management_api.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 //Services
-builder.Services.AddScoped<IDatabaseService, DatabaseService>();
-builder.Services.AddScoped<IMongoService, MongoService>();
 builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<IRecordRequestService, RecordRequestService>();
+builder.Services.AddScoped<ICacheService, CacheService>();
 
 //Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -22,10 +24,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddResponseCaching();
+
 
 // JWT Configuration
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options => {
+    .AddJwtBearer(options =>
+    {
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -37,6 +42,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
         };
     });
+
+builder.Services.AddSingleton<IMongoDbContext, MongoDbContext>();
+builder.Services.AddScoped<IRedisContext, RedisContext>();
+
+builder.Services.AddDbContext<ApiDbContext>(options =>
+{
+    options.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=UserManagementDB");
+});
 
 
 
@@ -59,6 +72,6 @@ app.UseMiddleware<RecordRequestMiddleware>();
 
 app.MapControllers();
 
-
+app.UseResponseCaching();
 
 app.Run();

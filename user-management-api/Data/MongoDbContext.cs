@@ -3,15 +3,15 @@ using user_management_api.Models;
 
 namespace user_management_api.Data
 {
-    public class MongoDbContext
+    public class MongoDbContext : IMongoDbContext
     {
-        private readonly  IMongoDatabase _database;
-        public MongoDbContext(string databaseName, string connectionStr) { 
+        private readonly IMongoDatabase database;
+        public MongoDbContext(IConfiguration configuration) { 
 
-            var client = new MongoClient(connectionStr);
-            _database = client.GetDatabase(databaseName);
+            var client = new MongoClient(configuration["UserManagementDatabase:ConnectionString"]);
+            database = client.GetDatabase(configuration["UserManagementDatabase:DatabaseName"]);
         }
 
-        public IMongoCollection<RequestHistory> RequestHistoryModel => _database.GetCollection<RequestHistory>("requestHistory");
+        public IMongoCollection<RequestHistory> RequestHistoryModel => database.GetCollection<RequestHistory>("requestHistory");
     }
 }
