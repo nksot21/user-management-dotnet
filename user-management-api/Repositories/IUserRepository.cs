@@ -13,5 +13,7 @@ namespace user_management_api.Repositories
 
         public Task Delete(IndividualUser individualUser);
 
+        public Task<IndividualUser> FindByUsername(string username);
+
     }
 }

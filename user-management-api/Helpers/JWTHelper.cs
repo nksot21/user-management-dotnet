@@ -29,10 +29,18 @@ namespace user_management_api.Helpers
 
         public static string GetPayload(string token)
         {
-            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            var payload = handler.ReadJwtToken(token);
-            var username = payload.Claims.FirstOrDefault().Value;
-            return username;
+            try
+            {
+                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                var payload = handler.ReadJwtToken(token);
+                var username = payload.Claims.FirstOrDefault().Value;
+                return username;
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+           
         }
     }
 }

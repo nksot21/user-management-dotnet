@@ -15,7 +15,7 @@ namespace user_management_api.Helpers
             string hashed = Convert.ToBase64String(hashBytes);
             return hashed;
         }
-        public static (string hashedPassword, int salt) hashPassword(string password)
+        public static (string hashedPassword, int salt) HashPassword(string password)
         {
             try
             {
@@ -27,7 +27,7 @@ namespace user_management_api.Helpers
             }
         }
 
-        public static bool verifyPassword(string password, string hashedPassword, int salt) {
+        public static bool VerifyPassword(string password, string hashedPassword, int salt) {
             try
             {
                 var hashPasswordReq = hash(password, salt);

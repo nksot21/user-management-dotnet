@@ -22,12 +22,11 @@ namespace user_management_api.Services
     }
     public class UserServices : IUserServices
     {
-        private IDatabaseService databaseService { get; }
-        private IUserRepository userRepository { get; }
+        private readonly IUserRepository userRepository;
 
-        public UserServices(IDatabaseService databaseService, IUserRepository userRepository)
+        public UserServices(IUserRepository userRepository)
         {
-            this.databaseService = databaseService;
+
             this.userRepository = userRepository;
         }
 
@@ -105,7 +104,7 @@ namespace user_management_api.Services
 
         public async Task<IndividualUser> FindByUsername(string username)
         {
-            IndividualUser individualUser = await databaseService.Context.IndividualUsersModel.FirstOrDefaultAsync(x => (x.Username == username && x.DeletedAt == null));
+            IndividualUser individualUser = await userRepository.FindByUsername(username);
             return individualUser;
         }
 

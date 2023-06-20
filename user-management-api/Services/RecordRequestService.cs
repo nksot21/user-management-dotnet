@@ -1,11 +1,12 @@
-﻿using user_management_api.Models;
+﻿using user_management_api.Data;
+using user_management_api.Models;
 
 namespace user_management_api.Services
 {
     public class RecordRequestService : IRecordRequestService
     {
-        private readonly IMongoService mongoService;
-        public RecordRequestService(IMongoService mongoService) { 
+        private readonly IMongoDbContext mongoService;
+        public RecordRequestService(IMongoDbContext mongoService) { 
             this.mongoService = mongoService;  
         }
 
@@ -13,7 +14,7 @@ namespace user_management_api.Services
         {
             try
             {
-                await mongoService.MongoContext.RequestHistoryModel.InsertOneAsync(requestHistory);
+                await mongoService.RequestHistoryModel.InsertOneAsync(requestHistory);
                 return true;
             }catch (Exception ex)
             {
