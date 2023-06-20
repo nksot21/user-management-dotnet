@@ -159,27 +159,34 @@ namespace user_management_api.Controllers
             return Ok(new Response { Status = 200, Message = "Delete User Successfully", Data = { } });
         }
 
-        [HttpPost("login/")]
-        async public Task<IActionResult> Login([FromBody] LoginModel loginData)
+        async private Task<(IndividualUser user, string jwtToken)> handleLogin(LoginModel loginData)
         {
             // Validate Email
-            IndividualUser individualUser = await UserService.FindByUsername(loginData.Username);
-            if (individualUser == null)
+            IndividualUser user = await UserService.FindByUsername(loginData.Username);
+            if (user == null)
             {
                 throw new Exception("User Not Found");
             }
 
-            var result = PasswordHelper.VerifyPassword(loginData.Password, individualUser.Password, individualUser.Salt);
+            var result = PasswordHelper.VerifyPassword(loginData.Password, user.Password, user.Salt);
             if (result == false)
             {
                 throw new Exception("Incorrect password");
             }
 
             // Generate Access Token
-            var jwtToken = JWTHelper.GenerateJWT(individualUser.Username, Configuration["JWT:Issuer"], Configuration["JWT:Audience"], Configuration["JWT:Key"]);
+            var jwtToken = JWTHelper.GenerateJWT(user.Username, Configuration["JWT:Issuer"], Configuration["JWT:Audience"], Configuration["JWT:Key"]);
+            return (user,  jwtToken);
+        }
+
+        [HttpPost("login/")]
+        async public Task<IActionResult> Login([FromBody] LoginModel loginData)
+        {
+            // Check/handle Login Data
+            var data = await handleLogin(loginData);
 
             // Save Access Token to Redis
-            var cacheResult = await CacheService.Set(individualUser.Username, jwtToken, DateTime.Now.AddMinutes(200));
+            var cacheResult = await CacheService.Set(data.user.Username, data.jwtToken, DateTime.Now.AddMinutes(200));
             if (cacheResult == false)
             {
                 throw new Exception("Cache access token failed");
@@ -188,8 +195,8 @@ namespace user_management_api.Controllers
             // Response
             var response = new LoginResponseModel()
             {
-                Username = individualUser.Username,
-                AccessToken = jwtToken,
+                Username = data.user.Username,
+                AccessToken = data.jwtToken,
             };
             return Ok(new Response() { Status = 200, Message = "Login Successfully", Data = response });
         }

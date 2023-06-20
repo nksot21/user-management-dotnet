@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using user_management_api.Repositories;
 
 namespace user_management_api.Entities
 {
     [Table("user")]
-    public class IndividualUser
+    public class IndividualUser : IEntity
     {
         [Key]
         [Column("id")]
