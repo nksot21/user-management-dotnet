@@ -22,12 +22,13 @@ namespace user_management_api.Services
     }
     public class UserServices : IUserServices
     {
-        private readonly IUserRepository userRepository;
+        //private readonly IUserRepository userRepository;
+        private readonly IRepository<IndividualUser> UserRepo;
 
-        public UserServices(IUserRepository userRepository)
+        public UserServices(IRepository<IndividualUser> userRepo)
         {
 
-            this.userRepository = userRepository;
+            UserRepo = userRepo;
         }
 
         //public async Task<(bool, string)> CreateUser(IndividualUser user)
@@ -35,7 +36,7 @@ namespace user_management_api.Services
         {
             try
             {
-                await userRepository.Add(user);
+                await UserRepo.CreateAsync(user);
                 //return (true, "Thnhaf công");
                 return true;
             }catch (Exception ex)
@@ -46,14 +47,14 @@ namespace user_management_api.Services
 
         public async Task<List<IndividualUser>> GetAllUser()
         {
-            List<IndividualUser> allUserLst = await userRepository.GetAll();
+            List<IndividualUser> allUserLst = await UserRepo.GetAllAsync();
             List<IndividualUser> userLst = allUserLst.Where(usr => usr.DeletedAt == null).ToList();
             return userLst;
         }
 
         public async Task<IndividualUser> GetUserById(int id)
         {
-            var usr = await userRepository.GetById(id);
+            var usr = await UserRepo.GetByIdAsync(id);
             return usr;
         }
 
@@ -65,7 +66,7 @@ namespace user_management_api.Services
                 user.Username = userReq.Username;
                 user.Email = userReq.Email;
                 user.UpdatedAt = DateTime.Now;
-                await userRepository.Update(user);
+                await UserRepo.UpdateAsync(user);
                 return true;
             }catch(Exception ex)
             {
@@ -79,7 +80,7 @@ namespace user_management_api.Services
         {
             try
             {
-                await userRepository.Delete(urs);
+                await UserRepo.DeleteByIdAsync(urs);
                 return true;
             }catch(Exception ex)
             {
@@ -93,7 +94,7 @@ namespace user_management_api.Services
             try
             {
                 urs.DeletedAt = DateTime.Now;
-                await userRepository.Update(urs);
+                await UserRepo.UpdateAsync(urs);
                 return true;
             }
             catch(Exception ex)
@@ -104,8 +105,8 @@ namespace user_management_api.Services
 
         public async Task<IndividualUser> FindByUsername(string username)
         {
-            IndividualUser individualUser = await userRepository.FindByUsername(username);
-            return individualUser;
+            List<IndividualUser> individualUser = UserRepo.GetByQueryAsync(user => user.Username == username && user.DeletedAt == null);
+            return individualUser[0];
         }
 
         public bool CheckPassword(IndividualUser user, string password)

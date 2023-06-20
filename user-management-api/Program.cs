@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
@@ -17,6 +18,7 @@ builder.Services.AddScoped<ICacheService, CacheService>();
 
 //Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -68,6 +70,7 @@ app.UseAuthorization();
 
 // Middleware pipeline
 app.UseMiddleware<RequestHandleMiddleware>();
+app.UseMiddleware<ValidTokenVerifyMiddleware>();
 app.UseMiddleware<RecordRequestMiddleware>();
 
 app.MapControllers();

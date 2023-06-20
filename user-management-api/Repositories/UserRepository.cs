@@ -17,6 +17,7 @@ namespace user_management_api.Repositories
         {
             await _context.IndividualUsersModel.AddAsync(individualUser);
             await _context.SaveChangesAsync();
+           
         }
 
         async public Task<List<IndividualUser>> GetAll() {
